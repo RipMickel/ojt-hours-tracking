@@ -57,8 +57,10 @@ function renderHead(string $title): void
       <span class="user-name"><?= e($u['name']) ?></span>
       <span class="user-role"><?= ucfirst($role) ?></span>
     </div>
-    <a class="btn" href="<?= BASE_URL ?>/auth/signout.php">Sign out</a>
-         <i class="icon-log-out"></i>
+    <a class="btn" href="<?= BASE_URL ?>/auth/signout.php" style="color: red;">
+    Sign out
+</a>
+<i class="icon-log-out" style="color: red;"></i>
     </a>
   </div>
 </aside>
