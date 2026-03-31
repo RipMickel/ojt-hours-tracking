@@ -20,6 +20,10 @@ function renderHead(string $title): void
     ];
 
     $current = $_SERVER['SCRIPT_NAME'] ?? '';
+
+    // Build today's date string in Asia/Manila timezone
+    $nowMnl  = new DateTime('now', new DateTimeZone('Asia/Manila'));
+    $todayLabel = $nowMnl->format('l, F j, Y'); // e.g. "Tuesday, March 31, 2026"
     ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,32 +37,26 @@ function renderHead(string $title): void
   <link rel="stylesheet" href="<?= $base ?>/assets/css/app.css">
   <style>
     .btn-signout {
-    display: inline-flex;       /* keeps it inline but flexible */
-    align-items: center;        /* vertical alignment */
-    gap: 6px;                   /* space between icon & text */
-    
-    padding: 6px 12px;
-    background: #e74c3c;
-    color: #fff;
-    border-radius: 5px;
-    text-decoration: none;
-    font-size: 14px;
-
-    transition: 0.3s ease;
-}
-
-/* Glow on hover */
-.btn-signout:hover {
-    background: #c0392b;
-    box-shadow: 0 0 8px rgba(231, 76, 60, 0.7);
-}
-
-/* Icon alignment fix */
-.btn-signout i {
-    font-size: 14px;
-    display: inline-block;
-}
-    </style>
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #e74c3c;
+      color: #fff;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 14px;
+      transition: 0.3s ease;
+    }
+    .btn-signout:hover {
+      background: #c0392b;
+      box-shadow: 0 0 8px rgba(231, 76, 60, 0.7);
+    }
+    .btn-signout i {
+      font-size: 14px;
+      display: inline-block;
+    }
+  </style>
 </head>
 <body data-role="<?= $role ?>">
 
@@ -85,9 +83,8 @@ function renderHead(string $title): void
       <span class="user-name"><?= e($u['name']) ?></span>
       <span class="user-role"><?= ucfirst($role) ?></span>
     </div>
-<a class="btn btn-signout" href="<?= BASE_URL ?>/auth/signout.php">
-    <i class="icon-log-out"></i> Sign out
-</a>
+    <a class="btn btn-signout" href="<?= BASE_URL ?>/auth/signout.php">
+      <i class="icon-log-out"></i> Sign out
     </a>
   </div>
 </aside>
@@ -96,7 +93,7 @@ function renderHead(string $title): void
   <header class="topbar">
     <div class="topbar-title">
       <h1><?= e($title) ?></h1>
-      <span class="topbar-date"><?= date('l, F j Y') ?></span>
+      <span class="topbar-date"><?= $todayLabel ?></span>
     </div>
     <button class="mobile-menu-btn" id="menuBtn"><i class="icon-menu"></i></button>
   </header>

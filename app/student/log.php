@@ -8,48 +8,45 @@ $u   = currentUser();
 $uid = $u['id'];
 $db  = db();
 
-// ── Selected date (default today) ────────────────────────────
-$logDate = $_POST['log_date'] ?? $_GET['date'] ?? date('Y-m-d');
+// ── "Today" in Asia/Manila — used as default date ────────────
+$today_ph = (new DateTime('now', new DateTimeZone('Asia/Manila')))->format('Y-m-d');
 
-// ── OPTIONAL: Load latest log for display only ───────────────
+// ── Selected date (default today in PH time) ─────────────────
+$logDate = $_POST['log_date'] ?? $_GET['date'] ?? $today_ph;
+
+// ── Load existing log for this date (display only) ───────────
 $todayStmt = $db->prepare(
-    "SELECT * FROM ojt_logs 
-     WHERE user_id=? AND log_date=? 
+    "SELECT * FROM ojt_logs
+     WHERE user_id=? AND log_date=?
      ORDER BY id DESC LIMIT 1"
 );
 $todayStmt->execute([$uid, $logDate]);
-$today = $todayStmt->fetch();
+$existing = $todayStmt->fetch();
 
 // ── Handle POST ──────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();
 
-    $timeIn   = trim($_POST['time_in']  ?? '');
-    $timeOut  = trim($_POST['time_out'] ?? '');
-    $remarks  = trim($_POST['remarks']  ?? '');
-    $logDate  = $_POST['log_date'] ?? date('Y-m-d');
+    $timeIn  = trim($_POST['time_in']  ?? '');
+    $timeOut = trim($_POST['time_out'] ?? '');
+    $remarks = trim($_POST['remarks']  ?? '');
+    $logDate = $_POST['log_date'] ?? $today_ph;
 
-    // Validate
     $errors = [];
-    if (!$timeIn)  $errors[] = 'Time In is required.';
+    if (!$timeIn) $errors[] = 'Time In is required.';
     if ($timeOut && $timeOut <= $timeIn) $errors[] = 'Time Out must be after Time In.';
 
     $hours = ($timeIn && $timeOut) ? calcHours($timeIn, $timeOut) : 0.0;
 
     if (empty($errors)) {
-
-        // 🔒 CHECK: already has log for this date?
         $checkStmt = $db->prepare(
             "SELECT COUNT(*) FROM ojt_logs WHERE user_id=? AND log_date=?"
         );
         $checkStmt->execute([$uid, $logDate]);
-        $exists = $checkStmt->fetchColumn();
 
-        if ($exists > 0) {
-            // ❌ Prevent duplicate log
+        if ($checkStmt->fetchColumn() > 0) {
             $errors[] = 'You cannot log again for this date.';
         } else {
-            // ✅ Insert if no existing log
             $stmt = $db->prepare(
                 "INSERT INTO ojt_logs (user_id, log_date, time_in, time_out, hours_rendered, remarks, status)
                  VALUES (?, ?, ?, ?, ?, ?, 'pending')"
@@ -73,7 +70,8 @@ renderHead('Log Hours');
 <div class="section-header">
   <div>
     <h2>Log Hours</h2>
-    <p>Record your time for <?= date('l, F j, Y', strtotime($logDate)) ?></p>
+    <!-- Use fmtDateFull() so it respects Asia/Manila, not the server's strtotime() -->
+    <p>Record your time for <?= fmtDateFull($logDate) ?></p>
   </div>
   <a href="<?= BASE_URL ?>/student/history.php" class="btn btn-ghost btn-sm">
     <i class="icon-calendar"></i> My History
@@ -141,15 +139,15 @@ renderHead('Log Hours');
       </div>
     </div>
 
-    <!-- Latest log preview -->
-    <?php if ($today): ?>
+    <!-- Existing log preview for selected date -->
+    <?php if ($existing): ?>
     <div class="card" style="margin-top:16px">
       <div class="card-head"><h3>Latest Entry (<?= fmtDate($logDate) ?>)</h3></div>
       <div class="card-body">
-        <div>Time In: <?= fmtTime($today['time_in']) ?></div>
-        <div>Time Out: <?= fmtTime($today['time_out']) ?></div>
-        <div>Hours: <?= fmtHours((float)$today['hours_rendered']) ?></div>
-        <div>Status: <?= statusBadge($today['status']) ?></div>
+        <div>Time In: <?= fmtTime($existing['time_in']) ?></div>
+        <div>Time Out: <?= fmtTime($existing['time_out']) ?></div>
+        <div>Hours: <?= fmtHours((float)$existing['hours_rendered']) ?></div>
+        <div>Status: <?= statusBadge($existing['status']) ?></div>
       </div>
     </div>
     <?php endif; ?>

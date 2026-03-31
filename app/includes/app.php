@@ -32,20 +32,17 @@ function fmtHours(float $h): string
 
 /**
  * Format a TIME column value (e.g. "08:00:00") as "8:00 AM".
- * TIME columns are timezone-neutral — we just parse them as-is
- * using today's date in Asia/Manila so strtotime() resolves correctly.
+ * TIME columns are timezone-neutral — anchor to today in Asia/Manila.
  */
 function fmtTime(?string $t): string
 {
     if (!$t) return '—';
-    // Anchor the bare time to today in Asia/Manila to avoid DST edge-cases
     $dt = new DateTime('today ' . $t, new DateTimeZone('Asia/Manila'));
     return $dt->format('g:i A');
 }
 
 /**
  * Format a DATE column value (e.g. "2026-03-31") as "Mar 31, 2026".
- * DATE columns have no time component, so we parse at midnight Asia/Manila.
  */
 function fmtDate(?string $d): string
 {
@@ -55,8 +52,18 @@ function fmtDate(?string $d): string
 }
 
 /**
- * Format a TIMESTAMP/DATETIME column that was stored in UTC (+00:00).
- * Converts to Asia/Manila before display.
+ * Format a DATE column value as a full label e.g. "Tuesday, March 31, 2026".
+ */
+function fmtDateFull(?string $d): string
+{
+    if (!$d) return '—';
+    $dt = new DateTime($d . ' 00:00:00', new DateTimeZone('Asia/Manila'));
+    return $dt->format('l, F j, Y');
+}
+
+/**
+ * Format a TIMESTAMP/DATETIME column stored in UTC.
+ * Converts UTC → Asia/Manila before display.
  */
 function fmtDatetime(?string $ts): string
 {

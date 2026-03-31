@@ -23,6 +23,7 @@ function db(): PDO
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES   => false,
             ]);
+            $pdo->exec("SET time_zone = '+08:00'"); // Asia/Manila (UTC+8)
         } catch (PDOException $e) {
             // Pretty error for development — remove in production
             http_response_code(500);
