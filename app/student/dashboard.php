@@ -1,5 +1,7 @@
 <?php
+
 // student/dashboard.php
+// Timezone is set globally in includes/app.php (Asia/Manila) — no need to repeat it here.
 require_once __DIR__ . '/../includes/app.php';
 require_once __DIR__ . '/../includes/layout.php';
 requireRole('student');
@@ -21,8 +23,12 @@ $sc = $db->prepare("SELECT status, COUNT(*) n FROM ojt_logs WHERE user_id = ? GR
 $sc->execute([$uid]);
 $counts = array_column($sc->fetchAll(), 'n', 'status');
 
-$tl = $db->prepare("SELECT * FROM ojt_logs WHERE user_id = ? AND log_date = CURDATE() LIMIT 1");
-$tl->execute([$uid]);
+// Use CURDATE() in Asia/Manila — since app.php already set the PHP timezone,
+// we pass today's date from PHP to avoid relying on the DB server's timezone.
+$today_ph = date('Y-m-d');   // Asia/Manila "today"
+
+$tl = $db->prepare("SELECT * FROM ojt_logs WHERE user_id = ? AND log_date = ? LIMIT 1");
+$tl->execute([$uid, $today_ph]);
 $today = $tl->fetch();
 
 $rl = $db->prepare("SELECT * FROM ojt_logs WHERE user_id = ? ORDER BY log_date DESC LIMIT 6");
@@ -32,12 +38,11 @@ $recent = $rl->fetchAll();
 renderHead('Dashboard');
 ?>
 
-<?php date_default_timezone_set('Asia/Manila'); ?>
 
 <div class="section-header">
   <div>
     <h2>
-      Good <?= date('H') < 12 ? 'morning' : (date('H') < 18 ? 'afternoon' : 'evening') ?>, 
+      Good <?= (int)date('H') < 12 ? 'morning' : ((int)date('H') < 18 ? 'afternoon' : 'evening') ?>, 
       <?= e(explode(' ', $u['name'])[0]) ?> 👋
     </h2>
     <p>Here's your OJT progress at a glance.</p>

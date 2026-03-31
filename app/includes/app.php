@@ -1,6 +1,9 @@
 <?php
 // includes/app.php — Bootstrap
 
+// ── Timezone (set FIRST, before any date/time calls) ─────────
+date_default_timezone_set('Asia/Manila');
+
 require_once __DIR__ . '/../config/database.php';
 
 // ── Auto-detect base URL ──────────────────────────────────────
@@ -27,14 +30,40 @@ function fmtHours(float $h): string
     return $mins > 0 ? "{$hrs}h {$mins}m" : "{$hrs}h";
 }
 
+/**
+ * Format a TIME column value (e.g. "08:00:00") as "8:00 AM".
+ * TIME columns are timezone-neutral — we just parse them as-is
+ * using today's date in Asia/Manila so strtotime() resolves correctly.
+ */
 function fmtTime(?string $t): string
 {
-    return $t ? date('g:i A', strtotime($t)) : '—';
+    if (!$t) return '—';
+    // Anchor the bare time to today in Asia/Manila to avoid DST edge-cases
+    $dt = new DateTime('today ' . $t, new DateTimeZone('Asia/Manila'));
+    return $dt->format('g:i A');
 }
 
+/**
+ * Format a DATE column value (e.g. "2026-03-31") as "Mar 31, 2026".
+ * DATE columns have no time component, so we parse at midnight Asia/Manila.
+ */
 function fmtDate(?string $d): string
 {
-    return $d ? date('M j, Y', strtotime($d)) : '—';
+    if (!$d) return '—';
+    $dt = new DateTime($d . ' 00:00:00', new DateTimeZone('Asia/Manila'));
+    return $dt->format('M j, Y');
+}
+
+/**
+ * Format a TIMESTAMP/DATETIME column that was stored in UTC (+00:00).
+ * Converts to Asia/Manila before display.
+ */
+function fmtDatetime(?string $ts): string
+{
+    if (!$ts) return '—';
+    $dt = new DateTime($ts, new DateTimeZone('UTC'));
+    $dt->setTimezone(new DateTimeZone('Asia/Manila'));
+    return $dt->format('M j, Y g:i A');
 }
 
 function statusBadge(string $status): string
@@ -55,14 +84,15 @@ function pct(float $done, int $req): int
 
 function calcHours(string $in, string $out): float
 {
-    $start = strtotime($in);
-    $end   = strtotime($out);
+    $tz    = new DateTimeZone('Asia/Manila');
+    $start = new DateTime('today ' . $in,  $tz);
+    $end   = new DateTime('today ' . $out, $tz);
 
-    $hours = ($end - $start) / 3600;
+    $hours = ($end->getTimestamp() - $start->getTimestamp()) / 3600;
 
-    // Deduct 1 hour if work period covers 12:00–1:00
-    $lunchStart = strtotime(date('Y-m-d 12:00:00', $start));
-    $lunchEnd   = strtotime(date('Y-m-d 13:00:00', $start));
+    // Deduct 1 hour if the work period overlaps the 12:00–13:00 lunch window
+    $lunchStart = new DateTime('today 12:00:00', $tz);
+    $lunchEnd   = new DateTime('today 13:00:00', $tz);
 
     if ($start < $lunchEnd && $end > $lunchStart) {
         $hours -= 1;
