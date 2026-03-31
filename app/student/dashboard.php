@@ -37,8 +37,13 @@ renderHead('Dashboard');
 <div class="section-header">
   <div>
     <h2>
-      Good <?= date('H') < 12 ? 'morning' : (date('H') < 18 ? 'afternoon' : 'evening') ?>, 
-      <?= e(explode(' ', $u['name'])[0]) ?> 👋
+  Good <?= date('H') < 12 
+    ? 'morning  ☀️' 
+    : (date('H') < 18 
+        ? 'afternoon 🌤️' 
+        : 'evening 🌙') 
+?>, 
+<?= e(explode(' ', $u['name'])[0]) ?>
     </h2>
     <p>Here's your OJT progress at a glance.</p>
   </div>
