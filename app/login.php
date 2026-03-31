@@ -69,22 +69,26 @@ $notice = match ($_GET['e'] ?? '') {
       <?php endif; ?>
 
       <form method="POST" action="">
-        <input type="hidden" name="_csrf" value="<?= e(csrf()) ?>">
-        <div class="form-group">
-          <label class="form-label" for="email">Email address</label>
-          <input type="email" id="email" name="email" class="form-control"
-                 value="<?= e($_POST['email'] ?? '') ?>"
-                 placeholder="you@example.com" required autofocus>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="password">Password</label>
-          <input type="password" id="password" name="password" class="form-control"
-                 placeholder="••••••••" required>
-        </div>
-        <button type="submit" class="btn btn-primary btn-full" style="margin-top:8px;padding:11px;">
-          <i class="icon-log-in"></i> Sign In
-        </button>
-      </form>
+  <input type="hidden" name="_csrf" value="<?= e(csrf()) ?>">
+
+  <div class="form-group">
+    <label class="form-label" for="email">Email address</label>
+    <input type="email" id="email" name="email" class="form-control"
+           value="<?= e($_POST['email'] ?? '') ?>"
+           placeholder="you@example.com" required autofocus>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="password">Password</label>
+    <input type="password" id="password" name="password" class="form-control"
+           placeholder="••••••••" required>
+  </div>
+
+  <!-- ✅ IMPORTANT: removed btn-full -->
+  <button id="loginBtn" type="submit" class="btn btn-primary login-btn">
+    <i class="icon-log-in"></i> Sign In
+  </button>
+</form>
 
       <div class="demo-box">
         <strong>Demo credentials (password: <code>password</code>)</strong>

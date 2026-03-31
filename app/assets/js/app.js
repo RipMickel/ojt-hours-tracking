@@ -6,8 +6,10 @@
   /* ── Mobile sidebar toggle ──────────────────────── */
   const menuBtn  = document.getElementById('menuBtn');
   const sidebar  = document.querySelector('.sidebar');
+
   if (menuBtn && sidebar) {
     menuBtn.addEventListener('click', () => sidebar.classList.toggle('open'));
+
     document.addEventListener('click', (e) => {
       if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
         sidebar.classList.remove('open');
@@ -19,9 +21,12 @@
   document.querySelectorAll('.progress-bar-fill[data-pct]').forEach(bar => {
     const target = bar.dataset.pct;
     bar.style.width = '0%';
-    requestAnimationFrame(() =>
-      setTimeout(() => { bar.style.width = target + '%'; }, 80)
-    );
+
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        bar.style.width = target + '%';
+      }, 80);
+    });
   });
 
   /* ── Live hours calculator ──────────────────────── */
@@ -29,19 +34,23 @@
     const inEl  = scope.querySelector('[data-time-in]')  || scope.querySelector('#time_in');
     const outEl = scope.querySelector('[data-time-out]') || scope.querySelector('#time_out');
     const prev  = scope.querySelector('.hours-preview');
+
     if (!inEl || !outEl || !prev) return;
 
     function recalc() {
       const tIn  = inEl.value;
       const tOut = outEl.value;
+
       if (!tIn || !tOut) {
         prev.textContent = '— hrs';
         prev.className = 'hours-preview';
         return;
       }
+
       const [ih, im] = tIn.split(':').map(Number);
       const [oh, om] = tOut.split(':').map(Number);
       const mins = (oh * 60 + om) - (ih * 60 + im);
+
       if (mins <= 0) {
         prev.textContent = 'Time-out must be after time-in';
         prev.className = 'hours-preview error';
@@ -52,19 +61,21 @@
         prev.className = 'hours-preview has-value';
       }
     }
+
     inEl.addEventListener('change', recalc);
     outEl.addEventListener('change', recalc);
     recalc();
   }
 
   document.querySelectorAll('.log-form').forEach(setupHoursCalc);
-  setupHoursCalc(document); // fallback for single-form pages
+  setupHoursCalc(document); // fallback
 
   /* ── Auto-dismiss success alerts ───────────────── */
   document.querySelectorAll('.alert-success').forEach(el => {
     setTimeout(() => {
       el.style.transition = 'opacity .4s';
-      el.style.opacity    = '0';
+      el.style.opacity = '0';
+
       setTimeout(() => el.remove(), 450);
     }, 4500);
   });
@@ -75,4 +86,31 @@
       if (!confirm(el.dataset.confirm)) e.preventDefault();
     });
   });
+
+  /* ── Login button move behavior (FIXED) ─────────── */
+  const email = document.getElementById("email");
+  const password = document.getElementById("password");
+  const button = document.getElementById("loginBtn");
+
+  if (email && password && button) {
+
+    function checkInputs() {
+      // Move button if ANY field is empty
+      if (email.value.trim() === "" || password.value.trim() === "") {
+        button.classList.add("btn-move");
+        button.classList.remove("btn-reset");
+      } else {
+        button.classList.add("btn-reset");
+        button.classList.remove("btn-move");
+      }
+    }
+
+    // Run immediately
+    checkInputs();
+
+    // Listen for typing
+    email.addEventListener("input", checkInputs);
+    password.addEventListener("input", checkInputs);
+  }
+
 })();
