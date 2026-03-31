@@ -92,10 +92,10 @@ $notice = match ($_GET['e'] ?? '') {
           <span><span class="demo-tag">Admin</span> admin@ojt.local</span>
         </div>
         <div class="demo-row">
-          <span><span class="demo-tag">Student</span> maria@student.local</span>
+          <span><span class="demo-tag">Student</span> mickel@student.local</span>
         </div>
         <div class="demo-row">
-          <span><span class="demo-tag">Student</span> jose@student.local</span>
+          <span><span class="demo-tag">Student</span> asnairah@student.local</span>
         </div>
       </div>
     </div>

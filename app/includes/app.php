@@ -55,8 +55,20 @@ function pct(float $done, int $req): int
 
 function calcHours(string $in, string $out): float
 {
-    $diff = strtotime($out) - strtotime($in);
-    return $diff > 0 ? round($diff / 3600, 2) : 0.0;
+    $start = strtotime($in);
+    $end   = strtotime($out);
+
+    $hours = ($end - $start) / 3600;
+
+    // Deduct 1 hour if work period covers 12:00–1:00
+    $lunchStart = strtotime(date('Y-m-d 12:00:00', $start));
+    $lunchEnd   = strtotime(date('Y-m-d 13:00:00', $start));
+
+    if ($start < $lunchEnd && $end > $lunchStart) {
+        $hours -= 1;
+    }
+
+    return $hours > 0 ? round($hours, 2) : 0.0;
 }
 
 // ── Query helpers ─────────────────────────────────────────────
