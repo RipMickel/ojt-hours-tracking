@@ -32,9 +32,14 @@ $recent = $rl->fetchAll();
 renderHead('Dashboard');
 ?>
 
+<?php date_default_timezone_set('Asia/Manila'); ?>
+
 <div class="section-header">
   <div>
-    <h2>Good <?= date('H') < 12 ? 'morning' : (date('H') < 18 ? 'afternoon' : 'evening') ?>, <?= e(explode(' ', $u['name'])[0]) ?> 👋</h2>
+    <h2>
+      Good <?= date('H') < 12 ? 'morning' : (date('H') < 18 ? 'afternoon' : 'evening') ?>, 
+      <?= e(explode(' ', $u['name'])[0]) ?> 👋
+    </h2>
     <p>Here's your OJT progress at a glance.</p>
   </div>
   <a href="<?= BASE_URL ?>/student/log.php" class="btn btn-primary">
