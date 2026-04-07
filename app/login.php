@@ -87,7 +87,7 @@ $notice = match ($_GET['e'] ?? '') {
       </form>
 
       <div class="demo-box">
-        <strong>Demo credentials (password: <code>password</code>)</strong>
+        <strong>Demo credentials (password: <code>ask the dev!</code>)</strong>
         <div class="demo-row">
           <span><span class="demo-tag">Admin</span> admin@ojt.local</span>
         </div>
