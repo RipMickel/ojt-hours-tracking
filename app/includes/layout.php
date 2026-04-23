@@ -63,7 +63,7 @@ function renderHead(string $title): void
 <aside class="sidebar">
   <div class="sidebar-brand">
     <span class="brand-mark">OJT</span>
-    <span class="brand-sub">Tracker</span>
+    <span class="brand-sub">Hours Tracker</span>
   </div>
   <nav class="sidebar-nav">
     <?php foreach ($navLinks as $l): ?>
