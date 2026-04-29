@@ -56,6 +56,7 @@ renderHead('Dashboard');
     <div class="stat-label">Approved Hours</div>
     <div class="stat-value"><?= fmtHours($approved) ?></div>
     <div class="stat-sub">of <?= $req ?>h required</div>
+    <p>You will finish on June 1, 2026 (Monday).</p>
   </div>
   <div class="stat-card">
     <div class="stat-icon ic-green"><i class="icon-trending-up"></i></div>
